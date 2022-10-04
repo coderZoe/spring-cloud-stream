@@ -1,0 +1,46 @@
+server:
+  port: 8823
+spring:
+  application:
+    name: consumer-log
+  cloud:
+    function:
+      definition: produceStr;upperCase;log
+    stream:
+      binders:
+        myRabbit:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: localhost
+                port: 5672
+                username: guest
+                password: guest
+        myKafka:
+          type: kafka
+          environment:
+            spring:
+              cloud:
+                stream:
+                  kafka:
+                    binder:
+                      brokers: localhost:9092
+
+      bindings:
+        produceStr-out-0:
+          binder: myKafka
+          destination: topic1
+        upperCase-in-0:
+          binder: myKafka
+          group: group1
+          destination: topic1
+        upperCase-out-0:
+          destination: topic2
+          binder: myRabbit
+        log-in-0:
+          binder: myRabbit
+          group: group1
+          destination: topic2
+
+
